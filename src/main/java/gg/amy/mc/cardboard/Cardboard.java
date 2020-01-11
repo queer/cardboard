@@ -8,6 +8,8 @@ import gg.amy.mc.cardboard.component.LoadableComponent;
 import gg.amy.mc.cardboard.component.Single;
 import gg.amy.mc.cardboard.config.Config;
 import gg.amy.mc.cardboard.di.Auto;
+import gg.amy.mc.cardboard.util.DirectedGraph;
+import gg.amy.mc.cardboard.util.TopologicalSort;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.bukkit.event.Listener;
@@ -46,6 +48,8 @@ public class Cardboard extends JavaPlugin {
     
     private void loadComponents() {
         singletons.put(getClass(), this);
+        final DirectedGraph<Class<?>> singletonGraph = new DirectedGraph<>();
+        
         graph.getClassesWithAnnotation(Component.class.getName())
                 .getNames()
                 .stream()
@@ -57,18 +61,33 @@ public class Cardboard extends JavaPlugin {
                     }
                 })
                 .forEach(c -> {
-                    try {
-                        if(c.isAnnotationPresent(Single.class)) {
-                            singletons.put(c, c.getConstructor().newInstance());
-                        } else {
-                            components.add(c);
-                            getLogger().info("Loaded new instanced component: " + c.getName());
+                    if(c.isAnnotationPresent(Single.class)) {
+                        singletonGraph.addNode(c);
+                        for(final Class<?> dep : c.getDeclaredAnnotation(Single.class).value()) {
+                            if(!c.isAnnotationPresent(Single.class)) {
+                                throw new IllegalArgumentException("@Single component " + c.getName() + " listed component "
+                                        + dep.getName() + ", but " + dep.getName() + " is not a @Single component!");
+                            }
+                            singletonGraph.addNode(dep);
+                            singletonGraph.addEdge(c, dep);
                         }
-                    } catch(final NullPointerException | IllegalAccessException | NoSuchMethodException
-                            | InvocationTargetException | InstantiationException e) {
-                        e.printStackTrace();
+                    } else {
+                        components.add(c);
+                        getLogger().info("Loaded new instanced component: " + c.getName());
                     }
                 });
+        
+        final List<Class<?>> dependencies = TopologicalSort.sort(singletonGraph);
+        Collections.reverse(dependencies);
+        for(final Class<?> dep : dependencies) {
+            try {
+                singletons.put(dep, dep.getDeclaredConstructor().newInstance());
+                getLogger().info("Loaded new singleton component: " + dep.getName());
+            } catch(final InstantiationException | NoSuchMethodException | InvocationTargetException
+                    | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     private void init() {

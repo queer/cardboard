@@ -9,7 +9,8 @@ import java.lang.annotation.Target;
  * @author amy
  * @since 1/9/20.
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Single {
+    Class<?>[] value() default {};
 }
