@@ -7,11 +7,13 @@ import gg.amy.mc.cardboard.component.Component;
 import gg.amy.mc.cardboard.component.LoadableComponent;
 import gg.amy.mc.cardboard.component.Single;
 import gg.amy.mc.cardboard.config.Config;
+import gg.amy.mc.cardboard.config.ConfigFileLoader;
 import gg.amy.mc.cardboard.di.Auto;
 import gg.amy.mc.cardboard.util.DirectedGraph;
 import gg.amy.mc.cardboard.util.TopologicalSort;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +31,7 @@ public class Cardboard extends JavaPlugin {
     private final Collection<Class<?>> commands = new HashSet<>();
     private final Map<Class<?>, Object> singletons = new HashMap<>();
     private final BukkitCommandInjector injector = new BukkitCommandInjector();
+    private final ConfigFileLoader loader = new ConfigFileLoader(this);
     private ScanResult graph;
     
     @Override
@@ -115,27 +118,35 @@ public class Cardboard extends JavaPlugin {
         for(final Field f : object.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(Config.class)) {
                 f.setAccessible(true);
-                final String path = f.getDeclaredAnnotation(Config.class).value();
+                final Config annotation = f.getDeclaredAnnotation(Config.class);
+                final String file = annotation.file();
+                final String path = annotation.value();
                 final Class<?> type = f.getType();
+                final ConfigurationSection config;
+                if(file.equalsIgnoreCase("config.yml")) {
+                    config = getConfig();
+                } else {
+                    config = loader.loadFile(file);
+                }
                 final Object value;
                 if(type.equals(Boolean.class) || type.equals(boolean.class)) {
-                    value = getConfig().getBoolean(path);
+                    value = config.getBoolean(path);
                 } else if(type.equals(Double.class) || type.equals(double.class)) {
-                    value = getConfig().getDouble(path);
+                    value = config.getDouble(path);
                 } else if(type.equals(Float.class) || type.equals(float.class)) {
-                    value = (float) getConfig().getDouble(path);
+                    value = (float) config.getDouble(path);
                 } else if(type.equals(Byte.class) || type.equals(byte.class)) {
-                    value = (byte) getConfig().getInt(path);
+                    value = (byte) config.getInt(path);
                 } else if(type.equals(Short.class) || type.equals(short.class)) {
-                    value = (short) getConfig().getInt(path);
+                    value = (short) config.getInt(path);
                 } else if(type.equals(Integer.class) || type.equals(int.class)) {
-                    value = getConfig().getInt(path);
+                    value = config.getInt(path);
                 } else if(type.equals(Long.class) || type.equals(long.class)) {
-                    value = getConfig().getLong(path);
+                    value = config.getLong(path);
                 } else if(type.equals(String.class)) {
-                    value = getConfig().getString(path);
+                    value = config.getString(path);
                 } else {
-                    value = getConfig().get(path);
+                    value = config.get(path);
                 }
                 f.setAccessible(true);
                 try {
@@ -157,23 +168,20 @@ public class Cardboard extends JavaPlugin {
                 field.setAccessible(true);
                 final Class<?> type = field.getType();
                 final Optional<Class<?>> ctxMatch = ctx.keySet().stream().filter(type::isAssignableFrom).findFirst();
-                if(ctxMatch.isPresent()) {
-                    try {
+                try {
+                    if(ctxMatch.isPresent()) {
                         field.set(object, ctx.get(ctxMatch.get()));
-                    } catch(final IllegalAccessException e) {
-                        // e.printStackTrace();
-                    }
-                } else {
-                    final Optional<?> located = getComponent(type, ctx);
-                    if(located.isPresent()) {
-                        try {
-                            field.set(object, located.get());
-                        } catch(final IllegalAccessException e) {
-                            // e.printStackTrace();
-                        }
                     } else {
-                        // throw new IllegalArgumentException("Couldn't find component for class of type " + type.getName() + '!');
+                        final Optional<?> located = getComponent(type, ctx);
+                        if(located.isPresent()) {
+                            field.set(object, located.get());
+                        } else {
+                            // TODO: Shouldn't this log a warning?
+                            // throw new IllegalArgumentException("Couldn't find component for class of type " + type.getName() + '!');
+                        }
                     }
+                } catch(final IllegalAccessException e) {
+                    e.printStackTrace();
                 }
             }
         }
