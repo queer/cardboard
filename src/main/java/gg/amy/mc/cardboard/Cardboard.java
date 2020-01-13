@@ -304,4 +304,8 @@ public class Cardboard extends JavaPlugin {
         }
         return cls.getAnnotation(Component.class).description();
     }
+    
+    public final ConfigurationSection loadConfig(final String path) {
+        return loader.loadFile(path);
+    }
 }

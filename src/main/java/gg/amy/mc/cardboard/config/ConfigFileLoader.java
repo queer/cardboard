@@ -21,6 +21,9 @@ public class ConfigFileLoader {
     }
     
     public ConfigurationSection loadFile(final String path) {
+        if(path.equalsIgnoreCase("config.yml")) {
+            return cardboard.getConfig();
+        }
         return configs.computeIfAbsent(path, __ -> {
             final File file = new File(cardboard.getDataFolder(), path);
             return YamlConfiguration.loadConfiguration(file);
