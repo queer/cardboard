@@ -9,12 +9,14 @@ import gg.amy.mc.cardboard.component.Single;
 import gg.amy.mc.cardboard.config.Config;
 import gg.amy.mc.cardboard.config.ConfigFileLoader;
 import gg.amy.mc.cardboard.di.Auto;
+import gg.amy.mc.cardboard.di.BukkitPlugin;
 import gg.amy.mc.cardboard.util.DirectedGraph;
 import gg.amy.mc.cardboard.util.TopologicalSort;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -164,11 +166,11 @@ public class Cardboard extends JavaPlugin {
     
     private void injectComponents(final Object object, final Map<Class<?>, ?> ctx) {
         for(final Field field : object.getClass().getDeclaredFields()) {
-            if(field.isAnnotationPresent(Auto.class)) {
-                field.setAccessible(true);
-                final Class<?> type = field.getType();
-                final Optional<Class<?>> ctxMatch = ctx.keySet().stream().filter(type::isAssignableFrom).findFirst();
-                try {
+            try {
+                if(field.isAnnotationPresent(Auto.class)) {
+                    field.setAccessible(true);
+                    final Class<?> type = field.getType();
+                    final Optional<Class<?>> ctxMatch = ctx.keySet().stream().filter(type::isAssignableFrom).findFirst();
                     if(ctxMatch.isPresent()) {
                         field.set(object, ctx.get(ctxMatch.get()));
                     } else {
@@ -180,9 +182,20 @@ public class Cardboard extends JavaPlugin {
                             // throw new IllegalArgumentException("Couldn't find component for class of type " + type.getName() + '!');
                         }
                     }
-                } catch(final IllegalAccessException e) {
-                    e.printStackTrace();
                 }
+                if(field.isAnnotationPresent(BukkitPlugin.class)) {
+                    field.setAccessible(true);
+                    final String name = field.getDeclaredAnnotation(BukkitPlugin.class).value();
+                    final Plugin plugin = getServer().getPluginManager().getPlugin(name);
+                    if(plugin == null) {
+                        throw new IllegalStateException("Was asked to load plugin " + name + " for " + object.getClass() + '#'
+                                + field.getName() + ", but that plugin doesn't exist? Is it loaded?");
+                    } else {
+                        field.set(object, plugin);
+                    }
+                }
+            } catch(final IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
     }
