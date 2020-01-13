@@ -21,5 +21,7 @@ public abstract class LoadableComponent {
     public void loadConfig() {
     }
     
-    public abstract boolean init();
+    public boolean init() {
+        return true;
+    }
 }

@@ -35,12 +35,12 @@ public class Cardboard extends JavaPlugin {
     private ScanResult graph;
     
     @Override
-    public void onLoad() {
+    public final void onLoad() {
         scan(getClass().getPackage().getName());
     }
     
     @Override
-    public void onEnable() {
+    public final void onEnable() {
         init();
     }
     
@@ -236,12 +236,12 @@ public class Cardboard extends JavaPlugin {
                 });
     }
     
-    public <T> Optional<T> getComponent(final Class<T> cls) {
+    public final <T> Optional<T> getComponent(final Class<T> cls) {
         return getComponent(cls, new HashMap<>());
     }
     
     @SuppressWarnings({"unchecked", "DuplicatedCode"})
-    public <T> Optional<T> getComponent(final Class<T> cls, final Map<Class<?>, ?> ctx) {
+    public final <T> Optional<T> getComponent(final Class<T> cls, final Map<Class<?>, ?> ctx) {
         if(singletons.containsKey(cls)) {
             return Optional.of((T) singletons.get(cls));
         } else {
@@ -267,12 +267,12 @@ public class Cardboard extends JavaPlugin {
         }
     }
     
-    public <T> Optional<T> getCommand(final Class<T> cls) {
+    public final <T> Optional<T> getCommand(final Class<T> cls) {
         return getCommand(cls, new HashMap<>());
     }
     
     @SuppressWarnings({"unchecked", "DuplicatedCode"})
-    public <T> Optional<T> getCommand(final Class<T> cls, final Map<Class<?>, ?> ctx) {
+    public final <T> Optional<T> getCommand(final Class<T> cls, final Map<Class<?>, ?> ctx) {
         final Optional<Class<?>> cmd = commands.stream().filter(cls::isAssignableFrom).findFirst();
         if(cmd.isPresent()) {
             try {
@@ -289,7 +289,7 @@ public class Cardboard extends JavaPlugin {
         }
     }
     
-    public <T> String getComponentName(final T component) {
+    public final <T> String getComponentName(final T component) {
         final Class<?> cls = component.getClass();
         if(!cls.isAnnotationPresent(Component.class)) {
             throw new IllegalArgumentException(cls.getName() + " isn't a @Component!");
@@ -297,7 +297,7 @@ public class Cardboard extends JavaPlugin {
         return cls.getAnnotation(Component.class).name();
     }
     
-    public <T> String getComponentDescription(final T component) {
+    public final <T> String getComponentDescription(final T component) {
         final Class<?> cls = component.getClass();
         if(!cls.isAnnotationPresent(Component.class)) {
             throw new IllegalArgumentException(cls.getName() + " isn't a @Component!");
