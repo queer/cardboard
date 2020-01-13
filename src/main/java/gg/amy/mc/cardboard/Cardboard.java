@@ -14,6 +14,7 @@ import gg.amy.mc.cardboard.util.DirectedGraph;
 import gg.amy.mc.cardboard.util.TopologicalSort;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -116,6 +117,7 @@ public class Cardboard extends JavaPlugin {
         });
     }
     
+    @SuppressWarnings("ConstantConditions")
     private void injectConfig(final Object object) {
         for(final Field f : object.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(Config.class)) {
@@ -146,7 +148,11 @@ public class Cardboard extends JavaPlugin {
                 } else if(type.equals(Long.class) || type.equals(long.class)) {
                     value = config.getLong(path);
                 } else if(type.equals(String.class)) {
-                    value = config.getString(path);
+                    if(annotation.coloured()) {
+                        value = ChatColor.translateAlternateColorCodes('&', config.getString(path));
+                    } else {
+                        value = config.getString(path);
+                    }
                 } else {
                     value = config.get(path);
                 }

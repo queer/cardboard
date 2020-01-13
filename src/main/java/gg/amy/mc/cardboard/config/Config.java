@@ -15,4 +15,6 @@ public @interface Config {
     String value();
     
     String file() default "config.yml";
+    
+    boolean coloured() default false;
 }
