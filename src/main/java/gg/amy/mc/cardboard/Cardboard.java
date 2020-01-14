@@ -117,8 +117,7 @@ public class Cardboard extends JavaPlugin {
         });
     }
     
-    @SuppressWarnings("ConstantConditions")
-    private void injectConfig(final Object object) {
+    public void injectConfig(final Object object) {
         for(final Field f : object.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(Config.class)) {
                 f.setAccessible(true);
@@ -132,37 +131,56 @@ public class Cardboard extends JavaPlugin {
                 } else {
                     config = loader.loadFile(file);
                 }
-                final Object value;
-                if(type.equals(Boolean.class) || type.equals(boolean.class)) {
-                    value = config.getBoolean(path);
-                } else if(type.equals(Double.class) || type.equals(double.class)) {
-                    value = config.getDouble(path);
-                } else if(type.equals(Float.class) || type.equals(float.class)) {
-                    value = (float) config.getDouble(path);
-                } else if(type.equals(Byte.class) || type.equals(byte.class)) {
-                    value = (byte) config.getInt(path);
-                } else if(type.equals(Short.class) || type.equals(short.class)) {
-                    value = (short) config.getInt(path);
-                } else if(type.equals(Integer.class) || type.equals(int.class)) {
-                    value = config.getInt(path);
-                } else if(type.equals(Long.class) || type.equals(long.class)) {
-                    value = config.getLong(path);
-                } else if(type.equals(String.class)) {
-                    if(annotation.coloured()) {
-                        value = ChatColor.translateAlternateColorCodes('&', config.getString(path));
-                    } else {
-                        value = config.getString(path);
-                    }
-                } else {
-                    value = config.get(path);
-                }
-                f.setAccessible(true);
-                try {
-                    f.set(object, value);
-                } catch(final IllegalAccessException e) {
-                    throw new IllegalStateException(e);
-                }
+                injectValueFromConfig(object, f, annotation, path, type, config);
             }
+        }
+    }
+    
+    public void injectConfigFromFile(final Object object, final String file) {
+        for(final Field f : object.getClass().getDeclaredFields()) {
+            if(f.isAnnotationPresent(Config.class)) {
+                f.setAccessible(true);
+                final Config annotation = f.getDeclaredAnnotation(Config.class);
+                final String path = annotation.value();
+                final Class<?> type = f.getType();
+                final ConfigurationSection config = loader.loadFile(file);
+                injectValueFromConfig(object, f, annotation, path, type, config);
+            }
+        }
+    }
+    
+    @SuppressWarnings("ConstantConditions")
+    private void injectValueFromConfig(final Object object, final Field f, final Config annotation, final String path,
+                                       final Class<?> type, final ConfigurationSection config) {
+        final Object value;
+        if(type.equals(Boolean.class) || type.equals(boolean.class)) {
+            value = config.getBoolean(path);
+        } else if(type.equals(Double.class) || type.equals(double.class)) {
+            value = config.getDouble(path);
+        } else if(type.equals(Float.class) || type.equals(float.class)) {
+            value = (float) config.getDouble(path);
+        } else if(type.equals(Byte.class) || type.equals(byte.class)) {
+            value = (byte) config.getInt(path);
+        } else if(type.equals(Short.class) || type.equals(short.class)) {
+            value = (short) config.getInt(path);
+        } else if(type.equals(Integer.class) || type.equals(int.class)) {
+            value = config.getInt(path);
+        } else if(type.equals(Long.class) || type.equals(long.class)) {
+            value = config.getLong(path);
+        } else if(type.equals(String.class)) {
+            if(annotation.coloured()) {
+                value = ChatColor.translateAlternateColorCodes('&', config.getString(path));
+            } else {
+                value = config.getString(path);
+            }
+        } else {
+            value = config.get(path);
+        }
+        f.setAccessible(true);
+        try {
+            f.set(object, value);
+        } catch(final IllegalAccessException e) {
+            throw new IllegalStateException(e);
         }
     }
     
