@@ -32,7 +32,7 @@ import java.util.*;
 public class Cardboard extends JavaPlugin {
     private final Collection<Class<?>> components = new HashSet<>();
     private final Collection<Class<?>> commands = new HashSet<>();
-    private final Map<Class<?>, Object> singletons = new HashMap<>();
+    private final Map<Class<?>, Object> singletons = new LinkedHashMap<>();
     private final BukkitCommandInjector injector = new BukkitCommandInjector();
     private final ConfigFileLoader loader = new ConfigFileLoader(this);
     private ScanResult graph;
@@ -149,7 +149,6 @@ public class Cardboard extends JavaPlugin {
         }
     }
     
-    @SuppressWarnings("ConstantConditions")
     private void injectValueFromConfig(final Object object, final Field f, final Config annotation, final String path,
                                        final Class<?> type, final ConfigurationSection config) {
         final Object value;
