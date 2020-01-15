@@ -169,7 +169,12 @@ public class Cardboard extends JavaPlugin {
             value = config.getLong(path);
         } else if(type.equals(String.class)) {
             if(annotation.coloured()) {
-                value = ChatColor.translateAlternateColorCodes('&', config.getString(path));
+                final String string = config.getString(path);
+                if(string != null) {
+                    value = ChatColor.translateAlternateColorCodes('&', string);
+                } else {
+                    value = null;
+                }
             } else {
                 value = config.getString(path);
             }
