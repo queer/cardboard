@@ -117,7 +117,7 @@ public class Cardboard extends JavaPlugin {
         });
     }
     
-    public void injectConfig(final Object object) {
+    public final void injectConfig(final Object object) {
         for(final Field f : object.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(Config.class)) {
                 f.setAccessible(true);
@@ -136,7 +136,7 @@ public class Cardboard extends JavaPlugin {
         }
     }
     
-    public void injectConfigFromFile(final Object object, final String file) {
+    public final void injectConfigFromFile(final Object object, final String file) {
         for(final Field f : object.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(Config.class)) {
                 f.setAccessible(true);
@@ -188,11 +188,11 @@ public class Cardboard extends JavaPlugin {
         }
     }
     
-    private void injectComponents(final Object component) {
+    public final void injectComponents(final Object component) {
         injectComponents(component, new HashMap<>());
     }
     
-    private void injectComponents(final Object object, final Map<Class<?>, ?> ctx) {
+    public final void injectComponents(final Object object, final Map<Class<?>, ?> ctx) {
         for(final Field field : object.getClass().getDeclaredFields()) {
             try {
                 if(field.isAnnotationPresent(Auto.class)) {
