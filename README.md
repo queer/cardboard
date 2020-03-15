@@ -7,10 +7,6 @@ dependency injection.
 
 cardboard requires Spigot 1.13.2 or higher.
 
-## TODO
-
-- Dependency graphs for proper component load ordering
-
 ## Features
 
 - Classes that implement the Bukkit listener interface are automatically loaded
