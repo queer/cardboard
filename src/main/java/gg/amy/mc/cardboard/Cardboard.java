@@ -206,8 +206,12 @@ public class Cardboard extends JavaPlugin {
                         if(located.isPresent()) {
                             field.set(object, located.get());
                         } else {
-                            // TODO: Shouldn't this log a warning?
-                            // throw new IllegalArgumentException("Couldn't find component for class of type " + type.getName() + '!');
+                            getLogger().severe(String.format(
+                                    "Couldn't inject component of type `%s` into %s#%s: no such component found!",
+                                    type.getName(),
+                                    object.getClass().getName(),
+                                    field.getName()
+                            ));
                         }
                     }
                 }

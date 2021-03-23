@@ -21,6 +21,16 @@ public abstract class LoadableComponent {
     public void loadConfig() {
     }
     
+    /**
+     * Inits this component very early in the init process. This only applies
+     * to {@link Single} components. You might use this if you're messing with
+     * the internals of the server.
+     * <p/>
+     * You probably don't want to use this.
+     */
+    public final void earlyInit() {
+    }
+    
     public boolean init() {
         return true;
     }
