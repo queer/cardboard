@@ -28,7 +28,7 @@ public abstract class LoadableComponent {
      * <p/>
      * You probably don't want to use this.
      */
-    public final void earlyInit() {
+    public void earlyInit() {
     }
     
     public boolean init() {
