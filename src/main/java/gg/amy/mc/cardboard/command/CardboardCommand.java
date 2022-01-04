@@ -82,8 +82,8 @@ public final class CardboardCommand extends Command {
         // TODO: Instead of passing String[] args, parse out quotes etc. for the end-user.
         final Map<Class<?>, Object> ctx = new HashMap<>();
         ctx.put(CommandSender.class, sender);
-        if(sender instanceof Player) {
-            ctx.put(Player.class, sender);
+        if(sender instanceof Player p) {
+            ctx.put(Player.class, p);
         }
         final Optional<?> maybeCommand = cardboard.getCommand(src, ctx);
         if(maybeCommand.isPresent()) {
