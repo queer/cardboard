@@ -61,7 +61,7 @@ public final class CardboardCommand extends Command {
     }
     
     @Override
-    public final boolean execute(final CommandSender commandSender, final String s, final String[] strings) {
+    public boolean execute(final CommandSender commandSender, final String s, final String[] strings) {
         if(commandSender.hasPermission(permission) || commandSender.isOp()) {
             final boolean ret;
             try {
