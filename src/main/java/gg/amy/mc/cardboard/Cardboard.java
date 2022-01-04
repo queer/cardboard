@@ -48,7 +48,7 @@ public class Cardboard extends JavaPlugin {
     }
     
     private void scan(final String pkg) {
-        graph = new ClassGraph().enableAllInfo().whitelistPackages(pkg).scan();
+        graph = new ClassGraph().enableAllInfo().acceptPackages(pkg).scan();
         loadComponents();
     }
     
@@ -106,8 +106,7 @@ public class Cardboard extends JavaPlugin {
         singletons.values().forEach(v -> {
             injectConfig(v);
             injectComponents(v);
-            if(v instanceof LoadableComponent) {
-                final LoadableComponent l = (LoadableComponent) v;
+            if(v instanceof LoadableComponent l) {
                 if(l.doInit()) {
                     getLogger().info("Loaded component " + getComponentName(v) + ": " + getComponentDescription(v));
                 } else {

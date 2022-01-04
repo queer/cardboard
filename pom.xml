@@ -9,13 +9,13 @@
     <version>0.1.0</version>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
         <encoding>UTF-8</encoding>
 
         <!-- We only support modern Minecraft versions -->
-        <spigot-api.version>1.16.5-R0.1-SNAPSHOT</spigot-api.version>
-        <classgraph.version>4.8.43</classgraph.version>
+        <spigot-api.version>1.18.1-R0.1-SNAPSHOT</spigot-api.version>
+        <classgraph.version>4.8.138</classgraph.version>
         <vault-api.version>1.7</vault-api.version>
         <paperlib.version>1.0.2</paperlib.version>
     </properties>
