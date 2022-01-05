@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -61,11 +62,10 @@ public final class CardboardCommand extends Command {
     }
     
     @Override
-    public boolean execute(final CommandSender commandSender, final String s, final String[] strings) {
+    public boolean execute(@Nonnull final CommandSender commandSender, @Nonnull final String s, @Nonnull final String[] strings) {
         if(commandSender.hasPermission(permission) || commandSender.isOp()) {
-            final boolean ret;
             try {
-                ret = executeCommand(commandSender, s, strings);
+                final boolean ret = executeCommand(commandSender, s, strings);
                 if(!ret) {
                     MessageUtil.sendMessage(commandSender, usageMessage);
                 }
