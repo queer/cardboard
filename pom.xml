@@ -16,7 +16,6 @@
         <!-- We only support modern Minecraft versions -->
         <spigot-api.version>1.18.1-R0.1-SNAPSHOT</spigot-api.version>
         <classgraph.version>4.8.138</classgraph.version>
-        <vault-api.version>1.7</vault-api.version>
         <paperlib.version>1.0.2</paperlib.version>
     </properties>
 
@@ -57,13 +56,6 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>${spigot-api.version}</version>
-        </dependency>
-
-        <!-- Vault API -->
-        <dependency>
-            <groupId>com.github.MilkBowl</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>${vault-api.version}</version>
         </dependency>
 
         <!-- PaperLib -->
